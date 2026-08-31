@@ -19,7 +19,7 @@ export default function MovieDetail() {
 
   return (
     <View>
-      <Text>{movie.title}</Text>
+      <Text>{movie.name}</Text>
       <Text>{movie.description}</Text>
     </View>
   );
