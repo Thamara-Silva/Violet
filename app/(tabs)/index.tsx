@@ -1,30 +1,34 @@
 import { movies } from '@/data/movie';
 import { Pressable, Text } from 'react-native';
-
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { useState } from 'react';
 
 export default function Produtos() {
   const router = useRouter();
+  const [search, setSearch] = useState('');
+
+  const filteredMovies = movies.filter((movie) =>
+    movie.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <View style={styles.fundo}>
       <View style={styles.container}>
 
-        {movies.map((movie) => (
+        {filteredMovies.map((movie) => (
           <Pressable
-  key={movie.id}
-  style={styles.filmes}
-onPress={() =>
-  router.push({
-    pathname: '/movies/[id]',
-    params: { id: movie.id.toString() },
-  })
-}
->
-  <Text>{movie.name}</Text>
-</Pressable>
-
+            key={movie.id}
+            style={styles.filmes}
+            onPress={() =>
+              router.push({
+                pathname: '/movies/[id]',
+                params: { id: movie.id.toString() },
+              })
+            }
+          >
+            <Text>{movie.name}</Text>
+          </Pressable>
         ))}
 
       </View>
@@ -32,10 +36,9 @@ onPress={() =>
   );
 }
 
-
 const styles = StyleSheet.create({
   fundo: {
-    backgroundColor: '#688fa7',
+    backgroundColor: '#0b0712',
     flex: 1,
     paddingTop: 10,
   },
