@@ -33,7 +33,7 @@ export default function RootLayout(){
     >
       <Tabs.Screen name="index" options={{title: "Filmes"}}/>
       <Tabs.Screen name="ingressos" options={{title: "Ingressos"}}/>
-      <Tabs.Screen name="cinemas" options={{title: "Cinemas"}}/>
+      <Tabs.Screen name="pagamento" options={{title: "Pagamento"}}/>
       <Tabs.Screen name="perfil" options={{title: "Perfil"}}/>
     </Tabs>
   )

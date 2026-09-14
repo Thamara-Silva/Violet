@@ -1,60 +1,137 @@
 import { movies } from '@/data/movie';
-import { useLocalSearchParams } from 'expo-router';
-import { Text, View, StyleSheet, Image, Pressable } from 'react-native';
+
+import {
+  useLocalSearchParams,
+  useRouter
+} from 'expo-router';
+
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Pressable,
+  ScrollView
+} from 'react-native';
+
+import React, { useState } from 'react';
 
 export default function MovieDetail() {
+
   const { id } = useLocalSearchParams();
+
+  const router = useRouter();
 
   const movie = movies.find(
     (movie) => movie.id === id
   );
 
+  const [sessaoSelecionada, setSessaoSelecionada] =
+    useState<string | null>(null);
+
   if (!movie) {
     return (
       <View style={styles.fundo}>
         <View style={styles.container}>
-        <Text>Filme não encontrado.</Text>
+          <Text>Filme não encontrado.</Text>
         </View>
       </View>
-
     );
   }
 
   return (
     <View style={styles.fundo}>
-      <View style={styles.container}>
-          <View style={styles.filme}>
 
-              <Text style={styles.titulo}>
-                {movie.name}
-              </Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.conteudo}
+        showsVerticalScrollIndicator={true}
+      >
 
+        <View style={styles.filme}>
 
-            <Image
-              source={movie.image}
-              style={styles.imagem}
-            />
+          <Text style={styles.titulo}>
+            {movie.name}
+          </Text>
 
-            <View style={styles.informacoes}>
+          <Image
+            source={movie.image}
+            style={styles.imagem}
+          />
 
-              <Text style={styles.descricao}>
-                {movie.description}
-              </Text>
+          <View style={styles.informacoes}>
 
-              <Pressable key={movie.id} style={styles.sessao}>  
+            <Text style={styles.descricao}>
+              {movie.description}
+            </Text>
 
-              </Pressable>
+            <Text style={styles.tituloSessao}>
+              Escolha uma sessão:
+            </Text>
+
+            <View style={styles.sessoes}>
+
+              {movie.sessoes.map((sessao) => (
+
+                <Pressable
+                  key={sessao}
+                  style={[
+                    styles.sessao,
+                    sessaoSelecionada === sessao &&
+                    styles.sessaoSelecionada
+                  ]}
+                  onPress={() =>
+                    setSessaoSelecionada(sessao)
+                  }
+                >
+
+                  <Text
+                    style={[
+                      styles.textoSessao,
+                      sessaoSelecionada === sessao &&
+                      styles.textoSessaoSelecionada
+                    ]}
+                  >
+                    {sessao}
+                  </Text>
+
+                </Pressable>
+
+              ))}
+
             </View>
 
+            {sessaoSelecionada && (
+
+              <Pressable
+                style={styles.botao}
+                onPress={() =>
+                  router.push(
+                    `/ingressos?id=${movie.id}&sessao=${sessaoSelecionada}`
+                  )
+                }
+              >
+
+                <Text style={styles.textoBotao}>
+                  Ir para ingressos
+                </Text>
+
+              </Pressable>
+
+            )}
 
           </View>
-      </View>
-    </View>
 
+        </View>
+
+      </ScrollView>
+
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+
   fundo: {
     backgroundColor: '#0b0712',
     flex: 1,
@@ -65,18 +142,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#2f1746',
     margin: 30,
     borderRadius: 15,
+  },
+
+  conteudo: {
     padding: 20,
-    height:'92%',
   },
 
   filme: {
     backgroundColor: '#7942ac',
     width: '100%',
-    height:'100%',
     borderRadius: 15,
     padding: 30,
-    alignItems:'center'
-
+    alignItems: 'center',
   },
 
   titulo: {
@@ -84,19 +161,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: '3%',
-    marginTop:'3%'
+    marginTop: '3%',
   },
 
-    imagem: {
+  imagem: {
     width: 300,
     height: 400,
     borderRadius: 10,
-    margin: 0,
+    borderWidth: 3,
+    borderColor: '#aa8fc3',
   },
 
   informacoes: {
-    flex: 1,
-    justifyContent: 'center',
+    width: '100%',
+    marginTop: 20,
+    alignItems: 'center',
   },
 
   descricao: {
@@ -105,8 +184,54 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  sessao:{
-    
-  }
+  tituloSessao: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 20,
+  },
 
-})
+  sessoes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+
+  sessao: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+  },
+
+  sessaoSelecionada: {
+    backgroundColor: '#7c3aed',
+    borderColor: '#7c3aed',
+  },
+
+  textoSessao: {
+    color: '#333',
+    fontWeight: 'bold',
+  },
+
+  textoSessaoSelecionada: {
+    color: '#fff',
+  },
+
+  botao: {
+    backgroundColor: '#25D366',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+
+  textoBotao: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
+});
