@@ -1,7 +1,13 @@
 import { movies } from '@/data/movie';
-import { Pressable, Text } from 'react-native';
+import {
+  Pressable,
+  Text,
+  ScrollView,
+  StyleSheet,
+  View,
+  Image,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 
 export default function Produtos() {
@@ -14,8 +20,7 @@ export default function Produtos() {
 
   return (
     <View style={styles.fundo}>
-      <View style={styles.container}>
-
+      <ScrollView contentContainerStyle={styles.container}>
         {filteredMovies.map((movie) => (
           <Pressable
             key={movie.id}
@@ -27,11 +32,23 @@ export default function Produtos() {
               })
             }
           >
-            <Text>{movie.name}</Text>
+            <Image
+              source={movie.image}
+              style={styles.imagem}
+            />
+
+            <View style={styles.informacoes}>
+              <Text style={styles.titulo}>
+                {movie.name}
+              </Text>
+
+              <Text style={styles.descricao}>
+                {movie.description}
+              </Text>
+            </View>
           </Pressable>
         ))}
-
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -44,19 +61,45 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    backgroundColor: '#ffffffec',
-    margin: 25,
+    backgroundColor: '#2f1746',
+    margin: 30,
     borderRadius: 15,
-    height: '92%',
     padding: 20,
+    gap: 15,
   },
 
   filmes: {
-    backgroundColor: '#0099f967',
-    margin: 30,
-    width: '30%',
+    backgroundColor: '#7942ac',
+    width: '100%',
+    minHeight: 130,
     borderRadius: 15,
-    padding: 15,
-    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 30,
+  },
+
+  imagem: {
+    width: 150,
+    height: 220,
+    borderRadius: 10,
+    margin: 0,
+  },
+
+  informacoes: {
+    flex: 1,
+    marginLeft: 30,
+    justifyContent: 'center',
+  },
+
+  titulo: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+
+  descricao: {
+    color: '#ddd',
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
