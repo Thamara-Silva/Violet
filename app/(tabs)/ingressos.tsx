@@ -31,11 +31,10 @@ export default function Ingressos() {
   if (!movie) {
     return (
       <View style={styles.fundo}>
-        <View style={styles.container}>
-          <Text style={styles.erro}>
-            Nenhum ingresso aqui :(
-          </Text>
-        </View>
+        <Image source={require('../../assets/imgs/MorceguinhoT.png')} style={styles.logo} />
+        <Text style={styles.erro}>
+          Nenhum ingresso por aqui.
+        </Text>
       </View>
     );
   }
@@ -66,8 +65,6 @@ export default function Ingressos() {
           <Text style={styles.sessao}>
             Sessão: {sessao}
           </Text>
-
-          <View style={styles.linha} />
 
           <Text style={styles.tituloQuantidade}>
             Quantidade de ingressos
@@ -160,7 +157,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 30,
   },
 
   imagem: {
@@ -183,18 +180,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  linha: {
-    width: '100%',
-    height: 1,
-    backgroundColor: '#ffffff50',
-    marginVertical: 20,
-  },
-
   tituloQuantidade: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 15,
+    marginTop: 20,
   },
 
   quantidade: {
@@ -235,13 +226,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 20,
   },
 
   botao: {
-    width: '100%',
-    backgroundColor: '#25D366',
+    width: '40%',
+    borderWidth: 1,
+    borderColor: '#c89de9',
     borderRadius: 10,
+    backgroundColor: '#2b004d',
     padding: 14,
     marginTop: 25,
     alignItems: 'center',
@@ -254,9 +247,19 @@ const styles = StyleSheet.create({
   },
 
   erro: {
-    color: '#fff',
+    color: '#e6d2f5',
     fontSize: 18,
     textAlign: 'center',
+    padding: 50,
   },
+
+    logo: {
+    alignSelf: 'center',
+    marginTop: '10%',
+    width: 250,
+    height: 210,
+    resizeMode: 'contain',
+  },
+
 
 });

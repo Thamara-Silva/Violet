@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-import {Text,View, StyleSheet, Image, Pressable, ScrollView,
+import {
+  Image, Pressable, ScrollView,
+  StyleSheet,
+  Text, View,
 } from 'react-native';
 
 import { useLocalSearchParams } from 'expo-router';
@@ -22,8 +25,9 @@ export default function Pagamento() {
   if (!movie) {
     return (
       <View style={styles.fundo}>
+        <Image source={require('../../assets/imgs/Morceguinho.png')} style={styles.logo} />
         <Text style={styles.erro}>
-          Filme não encontrado.
+          Nenhum pagamento pendente por aqui.
         </Text>
       </View>
     );
@@ -59,8 +63,6 @@ export default function Pagamento() {
             Quantidade: {quantidade}
           </Text>
 
-          <View style={styles.linha} />
-
           <Text style={styles.total}>
             Total: R$ {total.toFixed(2)}
           </Text>
@@ -70,30 +72,30 @@ export default function Pagamento() {
           </Text>
 
           <Pressable
-                style={[ styles.opcao, formaPagamento === 'Cartão de crédito' && styles.opcaoSelecionada
-                ]}
-                onPress={() => setFormaPagamento('Cartão de crédito')}>
+            style={[styles.opcao, formaPagamento === 'Cartão de crédito' && styles.opcaoSelecionada
+            ]}
+            onPress={() => setFormaPagamento('Cartão de crédito')}>
 
-                <Text
-                    style={[styles.textoOpcao, formaPagamento === 'Cartão de crédito' && styles.textoOpcaoSelecionada]}>
-                     Cartão de crédito
-                </Text>
+            <Text
+              style={[styles.textoOpcao, formaPagamento === 'Cartão de crédito' && styles.textoOpcaoSelecionada]}>
+              Cartão de crédito
+            </Text>
           </Pressable>
 
           <Pressable
             style={[styles.opcao, formaPagamento === 'Pix' && styles.opcaoSelecionada]} onPress={() => setFormaPagamento('Pix')}>
-              <Text style={[styles.textoOpcao, formaPagamento === 'Pix' && styles.textoOpcaoSelecionada]}>
-                Pix
-              </Text>
+            <Text style={[styles.textoOpcao, formaPagamento === 'Pix' && styles.textoOpcaoSelecionada]}>
+              Pix
+            </Text>
           </Pressable>
 
           <Pressable style={[styles.opcao, formaPagamento === 'Cartão de débito' && styles.opcaoSelecionada]} onPress={() => setFormaPagamento('Cartão de débito')}>
             <Text
-              style={[ styles.textoOpcao, formaPagamento === 'Cartão de débito' && styles.textoOpcaoSelecionada]}>
+              style={[styles.textoOpcao, formaPagamento === 'Cartão de débito' && styles.textoOpcaoSelecionada]}>
               Cartão de débito
             </Text>
-          </Pressable>          
-          
+          </Pressable>
+
           <Pressable style={styles.botao} onPress={() => alert('Obrigado por comprar com Violet!')}>
             <Text style={styles.textoBotao}>
               Pagar
@@ -137,7 +139,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 30,
   },
 
   imagem: {
@@ -160,18 +162,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-  linha: {
-    width: '100%',
-    height: 1,
-    backgroundColor: '#ffffff50',
-    marginVertical: 20,
-  },
-
   total: {
     color: '#fff',
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 10,
   },
 
   tituloPagamento: {
@@ -197,11 +193,13 @@ const styles = StyleSheet.create({
 
   botao: {
     width: '40%',
-    backgroundColor: '#25D366',
+    backgroundColor: '#2b004d',
     borderRadius: 10,
     padding: 14,
     marginTop: 15,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#c89de9',
   },
 
   textoBotao: {
@@ -211,19 +209,28 @@ const styles = StyleSheet.create({
   },
 
   erro: {
-    color: '#fff',
+    color: '#e6d2f5',
     fontSize: 18,
     textAlign: 'center',
+    padding: 10,
+  },
+
+  logo: {
+    alignSelf: 'center',
+    marginTop: '9%',
+    width: 300,
+    height: 260,
+    resizeMode: 'contain',
   },
 
   opcaoSelecionada: {
-  backgroundColor: '#7c3aed',
-  borderWidth: 2,
-  borderColor: '#fff',
-},
+    backgroundColor: '#2b004d',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
 
-textoOpcaoSelecionada: {
-  color: '#fff',
-},
+  textoOpcaoSelecionada: {
+    color: '#fff',
+  },
 
 });

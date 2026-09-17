@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    padding: 20,
+    padding: 0,
     gap: 15,
   },
 
@@ -87,18 +87,19 @@ const styles = StyleSheet.create({
     minHeight: 130,
     borderRadius: 15,
     flexDirection: 'row',
-    padding: 20,
+    padding: 30,
   },
 
   imagem: {
     width: 120,
     height: 180,
     borderRadius: 10,
+    marginLeft: 10,
   },
 
   informacoes: {
     flex: 1,
-    marginLeft: 20,
+    marginLeft: 30,
     justifyContent: 'center',
   },
 

@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#7942ac',
     width: '100%',
     borderRadius: 15,
-    padding: 30,
+    padding: 20,
     alignItems: 'center',
   },
 
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: '3%',
-    marginTop: '3%',
+    marginBottom: '2%',
+    marginTop: '1%',
   },
 
   imagem: {
@@ -173,8 +173,8 @@ const styles = StyleSheet.create({
   },
 
   informacoes: {
-    width: '100%',
-    marginTop: 20,
+    width: '50%',
+    marginTop: 30,
     alignItems: 'center',
   },
 
@@ -208,8 +208,8 @@ const styles = StyleSheet.create({
   },
 
   sessaoSelecionada: {
-    backgroundColor: '#7c3aed',
-    borderColor: '#7c3aed',
+    backgroundColor: '#2b004d',
+    borderColor: '#c89de9',
   },
 
   textoSessao: {
@@ -222,7 +222,10 @@ const styles = StyleSheet.create({
   },
 
   botao: {
-    backgroundColor: '#25D366',
+    width: '40%',
+    borderWidth: 1,
+    borderColor: '#c89de9',
+    backgroundColor: '#2b004d',
     borderRadius: 10,
     padding: 12,
     marginTop: 15,
