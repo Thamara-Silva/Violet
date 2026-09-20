@@ -9,9 +9,14 @@ import {
   ScrollView,
 } from 'react-native';
 
+import { Ionicons } from '@expo/vector-icons';
+
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { movies } from '@/data/movie';
+
+const PRECO_INGRESSO = 25;
+const MAX_INGRESSOS = 10;
 
 export default function Ingressos() {
 
@@ -23,15 +28,17 @@ export default function Ingressos() {
 
   const [quantidade, setQuantidade] = useState(1);
 
-  const preco = 25;
-  const total = quantidade * preco;
+  const total = quantidade * PRECO_INGRESSO;
 
   const router = useRouter();
 
   if (!movie) {
     return (
       <View style={styles.fundo}>
-        <Image source={require('../../assets/imgs/MorceguinhoT.png')} style={styles.logo} />
+        <Image
+          source={require('../../assets/imgs/MorceguinhoT.png')}
+          style={styles.logo}
+        />
         <Text style={styles.erro}>
           Nenhum ingresso por aqui.
         </Text>
@@ -39,15 +46,32 @@ export default function Ingressos() {
     );
   }
 
+  const diminuir = () => {
+    if (quantidade > 1) setQuantidade(quantidade - 1);
+  };
+
+  const aumentar = () => {
+    if (quantidade < MAX_INGRESSOS) setQuantidade(quantidade + 1);
+  };
+
   return (
     <View style={styles.fundo}>
 
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.conteudo}
+        showsVerticalScrollIndicator={false}
       >
 
         <View style={styles.ingressos}>
+
+          <Pressable
+            style={styles.botaoVoltar}
+            onPress={() => router.back()}
+            android_ripple={{ color: '#c89de9', borderless: true }}
+          >
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+          </Pressable>
 
           <Text style={styles.titulo}>
             Ingressos
@@ -62,9 +86,12 @@ export default function Ingressos() {
             {movie.name}
           </Text>
 
-          <Text style={styles.sessao}>
-            Sessão: {sessao}
-          </Text>
+          <View style={styles.badgeSessao}>
+            <Ionicons name="time-outline" size={14} color="#2b004d" />
+            <Text style={styles.textoBadge}>
+              Sessão: {sessao}
+            </Text>
+          </View>
 
           <Text style={styles.tituloQuantidade}>
             Quantidade de ingressos
@@ -73,16 +100,19 @@ export default function Ingressos() {
           <View style={styles.quantidade}>
 
             <Pressable
-              style={styles.botaoQuantidade}
-              onPress={() => {
-                if (quantidade > 1) {
-                  setQuantidade(quantidade - 1);
-                }
-              }}
+              style={[
+                styles.botaoQuantidade,
+                quantidade === 1 && styles.botaoDesabilitado,
+              ]}
+              onPress={diminuir}
+              disabled={quantidade === 1}
+              android_ripple={{ color: '#c89de9' }}
             >
-              <Text style={styles.textoQuantidade}>
-                -
-              </Text>
+              <Ionicons
+                name="remove"
+                size={22}
+                color={quantidade === 1 ? '#8a7aa3' : '#fff'}
+              />
             </Pressable>
 
             <Text style={styles.numero}>
@@ -90,23 +120,33 @@ export default function Ingressos() {
             </Text>
 
             <Pressable
-              style={styles.botaoQuantidade}
-              onPress={() => setQuantidade(quantidade + 1)}
+              style={[
+                styles.botaoQuantidade,
+                quantidade === MAX_INGRESSOS && styles.botaoDesabilitado,
+              ]}
+              onPress={aumentar}
+              disabled={quantidade === MAX_INGRESSOS}
+              android_ripple={{ color: '#c89de9' }}
             >
-              <Text style={styles.textoQuantidade}>
-                +
-              </Text>
+              <Ionicons
+                name="add"
+                size={22}
+                color={quantidade === MAX_INGRESSOS ? '#8a7aa3' : '#fff'}
+              />
             </Pressable>
 
           </View>
 
           <Text style={styles.preco}>
-            Ingresso: R$ {preco.toFixed(2)}
+            Ingresso: R$ {PRECO_INGRESSO.toFixed(2)}
           </Text>
 
-          <Text style={styles.total}>
-            Total: R$ {total.toFixed(2)}
-          </Text>
+          <View style={styles.caixaTotal}>
+            <Text style={styles.labelTotal}>Total</Text>
+            <Text style={styles.valorTotal}>
+              R$ {total.toFixed(2)}
+            </Text>
+          </View>
 
           <Pressable
             style={styles.botao}
@@ -115,11 +155,14 @@ export default function Ingressos() {
                 `/pagamento?id=${movie.id}&sessao=${sessao}&quantidade=${quantidade}`
               )
             }
+            android_ripple={{ color: '#c89de9' }}
           >
             <Text style={styles.textoBotao}>
               Continuar
             </Text>
+            <Ionicons name="arrow-forward" size={18} color="#2b004d" />
           </Pressable>
+
         </View>
 
       </ScrollView>
@@ -132,14 +175,17 @@ const styles = StyleSheet.create({
 
   fundo: {
     flex: 1,
-    backgroundColor: '#0b0712',
+    backgroundColor: '#120b1d',
     paddingTop: 10,
   },
 
   container: {
-    backgroundColor: '#2f1746',
-    margin: 30,
-    borderRadius: 15,
+    backgroundColor: '#7942ac',
+    margin: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#c89de9',
+    elevation: 10,
   },
 
   conteudo: {
@@ -147,24 +193,39 @@ const styles = StyleSheet.create({
   },
 
   ingressos: {
-    backgroundColor: '#7942ac',
-    borderRadius: 15,
-    padding: 30,
     alignItems: 'center',
+  },
+
+  
+  botaoVoltar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: '#2b004d',
+    borderWidth: 1,
+    borderColor: '#c89de9',
+    borderRadius: 50,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
   },
 
   titulo: {
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 20,
   },
 
   imagem: {
     width: 150,
     height: 200,
     borderRadius: 10,
-    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#c89de9',
+    marginBottom: 16,
   },
 
   nomeFilme: {
@@ -174,75 +235,117 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  sessao: {
-    color: '#ddd',
-    fontSize: 16,
-    marginTop: 10,
+  badgeSessao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#c89de9',
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginTop: 12,
+  },
+
+  textoBadge: {
+    color: '#2b004d',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
 
   tituloQuantidade: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 15,
-    marginTop: 20,
+    marginBottom: 12,
+    marginTop: 22,
   },
 
   quantidade: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
+    gap: 14,
   },
 
   botaoQuantidade: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: 10,
-    backgroundColor: '#7c3aed',
+    backgroundColor: '#2b004d',
+    borderWidth: 1,
+    borderColor: '#c89de9',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  textoQuantidade: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+  botaoDesabilitado: {
+    opacity: 0.4,
   },
 
   numero: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
+    minWidth: 32,
+    textAlign: 'center',
   },
 
   preco: {
-    color: '#ddd',
+    color: '#f0e5ff',
     fontSize: 15,
-    marginTop: 25,
+    marginTop: 22,
   },
 
-  total: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 20,
-  },
-
-  botao: {
-    width: '40%',
+  caixaTotal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#2b004d',
     borderWidth: 1,
     borderColor: '#c89de9',
-    borderRadius: 10,
-    backgroundColor: '#2b004d',
-    padding: 14,
-    marginTop: 25,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginTop: 16,
+    width: '80%',
+    alignSelf: 'center',
+  },
+
+  labelTotal: {
+    color: '#c89de9',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  valorTotal: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+
+  botao: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#c89de9',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginTop: 20,
+    width: '80%',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
 
   textoBotao: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#2b004d',
+    fontSize: 15,
     fontWeight: 'bold',
   },
 
@@ -253,13 +356,12 @@ const styles = StyleSheet.create({
     padding: 50,
   },
 
-    logo: {
+  logo: {
     alignSelf: 'center',
     marginTop: '10%',
     width: 250,
     height: 210,
     resizeMode: 'contain',
   },
-
 
 });

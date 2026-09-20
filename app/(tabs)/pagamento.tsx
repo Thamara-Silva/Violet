@@ -6,26 +6,36 @@ import {
   Text, View,
 } from 'react-native';
 
-import { useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { movies } from '@/data/movie';
+
+const PRECO_INGRESSO = 25;
 
 export default function Pagamento() {
 
   const { id, sessao, quantidade } = useLocalSearchParams();
 
+  const router = useRouter();
+
   const movie = movies.find(
     (movie) => movie.id === id
   );
 
-  const preco = 25;
-  const total = Number(quantidade) * preco;
-  const [formaPagamento, setFormaPagamento] = useState<string | null>(null);
+  const total = Number(quantidade) * PRECO_INGRESSO;
+
+  const [formaPagamento, setFormaPagamento] =
+    useState<string | null>(null);
 
   if (!movie) {
     return (
       <View style={styles.fundo}>
-        <Image source={require('../../assets/imgs/Morceguinho.png')} style={styles.logo} />
+        <Image
+          source={require('../../assets/imgs/Morceguinho.png')}
+          style={styles.logo}
+        />
         <Text style={styles.erro}>
           Nenhum pagamento pendente por aqui.
         </Text>
@@ -33,14 +43,30 @@ export default function Pagamento() {
     );
   }
 
+  const opcoes = [
+    { label: 'Cartão de crédito', icone: 'card' },
+    { label: 'Pix', icone: 'qr-code' },
+    { label: 'Cartão de débito', icone: 'card-outline' },
+  ];
+
   return (
     <View style={styles.fundo}>
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.conteudo}>
+        contentContainerStyle={styles.conteudo}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View style={styles.pagamento}>
+
+          <Pressable
+            style={styles.botaoVoltar}
+            onPress={() => router.back()}
+            android_ripple={{ color: '#c89de9', borderless: true }}
+          >
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+          </Pressable>
 
           <Text style={styles.titulo}>
             Pagamento
@@ -55,51 +81,86 @@ export default function Pagamento() {
             {movie.name}
           </Text>
 
-          <Text style={styles.informacao}>
-            Sessão: {sessao}
-          </Text>
 
-          <Text style={styles.informacao}>
-            Quantidade: {quantidade}
-          </Text>
+          <View style={styles.badges}>
+            <View style={styles.badge}>
+              <Ionicons name="time-outline" size={13} color="#2b004d" />
+              <Text style={styles.textoBadge}>
+                {sessao}
+              </Text>
+            </View>
 
-          <Text style={styles.total}>
-            Total: R$ {total.toFixed(2)}
-          </Text>
+            <View style={styles.badge}>
+              <Ionicons name="ticket-outline" size={13} color="#2b004d" />
+              <Text style={styles.textoBadge}>
+                {quantidade} {Number(quantidade) === 1 ? 'ingresso' : 'ingressos'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.caixaTotal}>
+            <Text style={styles.labelTotal}>Total</Text>
+            <Text style={styles.valorTotal}>
+              R$ {total.toFixed(2)}
+            </Text>
+          </View>
 
           <Text style={styles.tituloPagamento}>
             Forma de pagamento
           </Text>
 
+          {opcoes.map((opcao) => {
+            const selecionada = formaPagamento === opcao.label;
+            return (
+              <Pressable
+                key={opcao.label}
+                style={[
+                  styles.opcao,
+                  selecionada && styles.opcaoSelecionada,
+                ]}
+                onPress={() => setFormaPagamento(opcao.label)}
+                android_ripple={{ color: '#c89de9' }}
+              >
+                <View style={styles.opcaoEsquerda}>
+                  <Ionicons
+                    name={opcao.icone as any}
+                    size={20}
+                    color={selecionada ? '#c89de9' : '#8a7aa3'}
+                  />
+                  <Text
+                    style={[
+                      styles.textoOpcao,
+                      selecionada && styles.textoOpcaoSelecionada,
+                    ]}
+                  >
+                    {opcao.label}
+                  </Text>
+                </View>
+
+                {selecionada && (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={20}
+                    color="#c89de9"
+                  />
+                )}
+              </Pressable>
+            );
+          })}
+
           <Pressable
-            style={[styles.opcao, formaPagamento === 'Cartão de crédito' && styles.opcaoSelecionada
+            style={[
+              styles.botao,
+              !formaPagamento && styles.botaoDesabilitado,
             ]}
-            onPress={() => setFormaPagamento('Cartão de crédito')}>
-
-            <Text
-              style={[styles.textoOpcao, formaPagamento === 'Cartão de crédito' && styles.textoOpcaoSelecionada]}>
-              Cartão de crédito
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={[styles.opcao, formaPagamento === 'Pix' && styles.opcaoSelecionada]} onPress={() => setFormaPagamento('Pix')}>
-            <Text style={[styles.textoOpcao, formaPagamento === 'Pix' && styles.textoOpcaoSelecionada]}>
-              Pix
-            </Text>
-          </Pressable>
-
-          <Pressable style={[styles.opcao, formaPagamento === 'Cartão de débito' && styles.opcaoSelecionada]} onPress={() => setFormaPagamento('Cartão de débito')}>
-            <Text
-              style={[styles.textoOpcao, formaPagamento === 'Cartão de débito' && styles.textoOpcaoSelecionada]}>
-              Cartão de débito
-            </Text>
-          </Pressable>
-
-          <Pressable style={styles.botao} onPress={() => alert('Obrigado por comprar com Violet!')}>
+            onPress={() => alert('Obrigado por comprar com Violet!')}
+            disabled={!formaPagamento}
+            android_ripple={{ color: '#c89de9' }}
+          >
             <Text style={styles.textoBotao}>
               Pagar
             </Text>
+            <Ionicons name="arrow-forward" size={18} color="#2b004d" />
           </Pressable>
 
         </View>
@@ -114,14 +175,17 @@ const styles = StyleSheet.create({
 
   fundo: {
     flex: 1,
-    backgroundColor: '#0b0712',
+    backgroundColor: '#120b1d',
     paddingTop: 10,
   },
 
   container: {
-    backgroundColor: '#2f1746',
-    margin: 30,
-    borderRadius: 15,
+    backgroundColor: '#7942ac',
+    margin: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#c89de9',
+    elevation: 10,
   },
 
   conteudo: {
@@ -129,24 +193,38 @@ const styles = StyleSheet.create({
   },
 
   pagamento: {
-    backgroundColor: '#7942ac',
-    borderRadius: 15,
-    padding: 30,
     alignItems: 'center',
   },
 
+  botaoVoltar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: '#2b004d',
+    borderWidth: 1,
+    borderColor: '#c89de9',
+    borderRadius: 50,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+
   titulo: {
-    color: '#fff',
+    color: '#fff',   
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 20,
   },
 
   imagem: {
     width: 120,
     height: 160,
     borderRadius: 10,
-    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: '#c89de9',
+    marginBottom: 16,
   },
 
   nomeFilme: {
@@ -156,55 +234,137 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  informacao: {
-    color: '#ddd',
-    fontSize: 16,
-    marginTop: 8,
+   //nome chique pro horariozinho veio em baixo da foto 
+  badges: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
   },
 
-  total: {
-    color: '#fff',
-    fontSize: 22,
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#c89de9',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+
+  textoBadge: {
+    color: '#2b004d',
+    fontSize: 12,
     fontWeight: 'bold',
-    marginBottom: 10,
-    marginTop: 10,
+  },
+
+  caixaTotal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#2b004d',
+    borderWidth: 1,
+    borderColor: '#c89de9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginTop: 18,
+    width: '80%',
+    alignSelf: 'center',
+  },
+
+  labelTotal: {
+    color: '#c89de9',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  valorTotal: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 
   tituloPagamento: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginTop: 24,
+    marginBottom: 12,
   },
 
+ 
   opcao: {
-    width: '40%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 10,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 20,
+  backgroundColor: '#2b004d',
+  borderWidth: 1,
+  borderColor: '#c89de9',
+  borderRadius: 12,
+  paddingHorizontal: 16,
+  paddingVertical: 12,
+  marginBottom: 10,
+  alignSelf: 'center',       
+  minWidth: 200,         
+},
+
+  opcaoSelecionada: {
+    backgroundColor: '#2b004d',
+    borderWidth: 2,
+    borderColor: '#c89de9',
+    shadowColor: '#c084fc',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+
+  opcaoEsquerda: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
 
   textoOpcao: {
-    color: '#333',
-    textAlign: 'center',
-    fontWeight: 'bold',
+    color: '#ddd',
+    fontSize: 15,
+    fontWeight: '600',
   },
 
+  textoOpcaoSelecionada: {
+    color: '#fff',
+  },
+
+
   botao: {
-    width: '40%',
-    backgroundColor: '#2b004d',
-    borderRadius: 10,
-    padding: 14,
-    marginTop: 15,
+    flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#c89de9',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#c89de9',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginTop: 20,
+    width: '80%',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+
+  botaoDesabilitado: {
+    opacity: 0.4,
   },
 
   textoBotao: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#2b004d',
+    fontSize: 15,
     fontWeight: 'bold',
   },
 
@@ -221,16 +381,6 @@ const styles = StyleSheet.create({
     width: 300,
     height: 260,
     resizeMode: 'contain',
-  },
-
-  opcaoSelecionada: {
-    backgroundColor: '#2b004d',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-
-  textoOpcaoSelecionada: {
-    color: '#fff',
   },
 
 });

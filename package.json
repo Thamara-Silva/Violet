@@ -1,9 +1,9 @@
-
-  {
+{
   "name": "violet",
-  "main": "expo-router/entry",  
+  "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
     "@react-navigation/bottom-tabs": "^7.18.18",
     "@react-navigation/native": "^7.3.18",
     "expo": "~57.0.18",
