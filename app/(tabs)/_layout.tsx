@@ -1,6 +1,13 @@
+
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, View, StyleSheet, TextInput, Image } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Image,
+  Platform,
+} from 'react-native';
 
 export default function TabLayout() {
   return (
@@ -15,21 +22,32 @@ export default function TabLayout() {
             />
 
             <View style={styles.pesquisaContainer}>
-              <Ionicons name="search" size={18} color="#b794f6" />
+              <Ionicons
+                name="search-outline"
+                size={19}
+                color="#b14cff"
+              />
+
               <TextInput
                 placeholder="Buscar filmes..."
-                placeholderTextColor="#8a7aa3"
+                placeholderTextColor="#92879f"
                 style={styles.pesquisaInput}
+                returnKeyType="search"
               />
             </View>
           </View>
         ),
 
+        sceneStyle: {
+          backgroundColor: '#0b0712',
+        },
+
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#c084fc',
-        tabBarInactiveTintColor: '#8a7aa3',
+        tabBarActiveTintColor: '#b14cff',
+        tabBarInactiveTintColor: '#92879f',
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarHideOnKeyboard: true,
+        tabBarItemStyle: styles.tabBarItem,
       }}
     >
       <Tabs.Screen
@@ -93,58 +111,60 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: '#2f1746',
-    paddingTop: 50,
-    paddingBottom: 18,
+    backgroundColor: '#0b0712',
+    paddingTop: Platform.OS === 'ios' ? 52 : 38,
+    paddingBottom: 16,
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
+    gap: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#281637',
   },
 
   headerLogo: {
-    width: 130,
-    height: 80,
+    width: 105,
+    height: 58,
   },
 
   pesquisaContainer: {
     flex: 1,
     height: 42,
-    backgroundColor: '#1f1030',
+    backgroundColor: '#17101f',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    borderRadius: 21,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#3d2360',
+    borderColor: '#352244',
   },
 
   pesquisaInput: {
     flex: 1,
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 14,
-    marginLeft: 8,
+    marginLeft: 9,
     paddingVertical: 0,
   },
 
   tabBar: {
-    backgroundColor: '#2f1746',
-    height: 70,
-    paddingBottom: 10,
-    paddingTop: 5,
-    borderTopWidth: 0,
+    backgroundColor: '#100b18',
+    height: Platform.OS === 'ios' ? 84 : 68,
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+    borderTopWidth: 1,
+    borderTopColor: '#281637',
     elevation: 0,
     shadowOpacity: 0,
+  },
+
+  tabBarItem: {
+    paddingVertical: 2,
   },
 
   tabBarLabel: {
     fontSize: 11,
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: 3,
   },
 });

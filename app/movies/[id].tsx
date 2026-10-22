@@ -1,8 +1,11 @@
+
+import React, { useState } from 'react';
+
 import { movies } from '@/data/movie';
 
 import {
   useLocalSearchParams,
-  useRouter
+  useRouter,
 } from 'expo-router';
 
 import {
@@ -11,31 +14,71 @@ import {
   StyleSheet,
   Image,
   Pressable,
-  ScrollView
+  ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import React, { useState } from 'react';
+const CORES = {
+  fundo: '#0b0712',
+  painel: '#100b18',
+  superficie: '#17101f',
+  roxo: '#b14cff',
+  lilas: '#d4a0ff',
+  texto: '#ffffff',
+  textoSecundario: '#a99bb8',
+  borda: '#30213d',
+};
 
 export default function MovieDetail() {
-
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{
+    id?: string | string[];
+  }>();
 
   const router = useRouter();
+  const { width } = useWindowDimensions();
+
+  const idFilme = Array.isArray(id) ? id[0] : id;
 
   const movie = movies.find(
-    (movie) => movie.id === id
+    (item) => String(item.id) === String(idFilme)
   );
 
   const [sessaoSelecionada, setSessaoSelecionada] =
     useState<string | null>(null);
 
+  const larguraPainel = Math.min(width - 32, 680);
+  const larguraPoster = width < 380 ? 155 : 190;
+  const alturaPoster = larguraPoster * 1.36;
+
   if (!movie) {
     return (
-      <View style={styles.fundo}>
-        <View style={styles.container}>
-          <Text style={styles.erro}>Filme não encontrado.</Text>
+      <View style={styles.fundoErro}>
+        <View style={styles.cardErro}>
+          <Ionicons
+            name="film-outline"
+            size={44}
+            color={CORES.lilas}
+          />
+
+          <Text style={styles.tituloErro}>
+            Filme não encontrado
+          </Text>
+
+          <Text style={styles.textoErro}>
+            Não conseguimos encontrar esse filme. Volte ao catálogo
+            e escolha outro título.
+          </Text>
+
+          <Pressable
+            style={styles.botaoVoltarErro}
+            onPress={() => router.replace('/')}
+          >
+            <Text style={styles.textoBotaoErro}>
+              Voltar aos filmes
+            </Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -43,54 +86,117 @@ export default function MovieDetail() {
 
   return (
     <View style={styles.fundo}>
-
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.conteudo}
         showsVerticalScrollIndicator={false}
       >
+        <View
+          style={[
+            styles.filme,
+            { width: larguraPainel },
+          ]}
+        >
+          {/* Cabeçalho */}
+          <View style={styles.cabecalho}>
+            <Pressable
+              style={styles.botaoVoltar}
+              onPress={() => router.back()}
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
+            >
+              <Ionicons
+                name="arrow-back"
+                size={21}
+                color={CORES.texto}
+              />
+            </Pressable>
 
-        <View style={styles.filme}>
-
-          <Pressable
-            style={styles.botaoVoltar}
-            onPress={() => router.back()}
-            android_ripple={{ color: '#c89de9', borderless: true }}
-          >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
-          </Pressable>
-
-          <Text style={styles.titulo}>
-            {movie.name}
-          </Text>
-
-          <Image
-            source={movie.image}
-            style={styles.imagem}
-          />
-
-          <View style={styles.informacoes}>
-
-            <Text style={styles.subtitulo}>
-              Sinopse
+            <Text style={styles.rotuloCabecalho}>
+              DETALHES DO FILME
             </Text>
+          </View>
+
+          {/* Poster e informações */}
+          <View style={styles.destaqueFilme}>
+            <Image
+              source={movie.image}
+              style={[
+                styles.imagem,
+                {
+                  width: larguraPoster,
+                  height: alturaPoster,
+                },
+              ]}
+              resizeMode="cover"
+            />
+
+            <View style={styles.detalhesPoster}>
+              <View style={styles.etiqueta}>
+                <Ionicons
+                  name="ticket-outline"
+                  size={13}
+                  color={CORES.lilas}
+                />
+
+                <Text style={styles.textoEtiqueta}>
+                  DISPONÍVEL
+                </Text>
+              </View>
+
+              <Text style={styles.titulo}>
+                {movie.name}
+              </Text>
+
+              <View style={styles.linhaDecorativa} />
+
+              <Text style={styles.textoPoster}>
+                Escolha sua sessão e prepare-se para a experiência.
+              </Text>
+            </View>
+          </View>
+
+          {/* Sinopse */}
+          <View style={styles.secao}>
+            <View style={styles.tituloSecaoContainer}>
+              <View style={styles.barraTitulo} />
+
+              <Text style={styles.subtitulo}>
+                Sinopse
+              </Text>
+            </View>
 
             <Text style={styles.descricao}>
               {movie.description}
             </Text>
+          </View>
 
+          {/* Sessões */}
+          <View style={styles.secao}>
             <View style={styles.tituloSessaoContainer}>
-              <Ionicons name="time-outline" size={18} color="#c89de9" />
-              <Text style={styles.tituloSessao}>
-                Escolha uma sessão
-              </Text>
+              <View style={styles.iconeSessao}>
+                <Ionicons
+                  name="time-outline"
+                  size={20}
+                  color={CORES.lilas}
+                />
+              </View>
+
+              <View style={styles.textosSessao}>
+                <Text style={styles.tituloSessao}>
+                  Escolha uma sessão
+                </Text>
+
+                <Text style={styles.ajudaSessao}>
+                  Selecione o horário que prefere.
+                </Text>
+              </View>
             </View>
 
             <View style={styles.sessoes}>
-
               {movie.sessoes.map((sessao) => {
-
-                const selecionada = sessaoSelecionada === sessao;
+                const selecionada =
+                  sessaoSelecionada === sessao;
 
                 return (
                   <Pressable
@@ -100,231 +206,406 @@ export default function MovieDetail() {
                       selecionada && styles.sessaoSelecionada,
                     ]}
                     onPress={() => setSessaoSelecionada(sessao)}
-                    android_ripple={{ color: '#c89de9' }}
+                    accessibilityRole="radio"
+                    accessibilityState={{
+                      selected: selecionada,
+                    }}
                   >
-                    {selecionada && (
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={14}
-                        color="#c89de9"
-                      />
-                    )}
+                    <Ionicons
+                      name={
+                        selecionada
+                          ? 'checkmark-circle'
+                          : 'time-outline'
+                      }
+                      size={16}
+                      color={
+                        selecionada
+                          ? CORES.fundo
+                          : CORES.lilas
+                      }
+                    />
+
                     <Text
                       style={[
                         styles.textoSessao,
-                        selecionada && styles.textoSessaoSelecionada,
+                        selecionada &&
+                          styles.textoSessaoSelecionada,
                       ]}
                     >
                       {sessao}
                     </Text>
                   </Pressable>
                 );
-
               })}
-
             </View>
 
             {!sessaoSelecionada && (
-              <Text style={styles.aviso}>
-                Selecione uma sessão para continuar
-              </Text>
-            )}
+              <View style={styles.aviso}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={16}
+                  color={CORES.textoSecundario}
+                />
 
-            {sessaoSelecionada && (
-              <Pressable
-                style={styles.botao}
-                onPress={() =>
-                  router.push(
-                    `/ingressos?id=${movie.id}&sessao=${sessaoSelecionada}`
-                  )
-                }
-                android_ripple={{ color: '#c89de9' }}
-              >
-                <Text style={styles.textoBotao}>
-                  Ir para ingressos
+                <Text style={styles.textoAviso}>
+                  Selecione uma sessão para continuar.
                 </Text>
-                <Ionicons name="arrow-forward" size={18} color="#2b004d" />
-              </Pressable>
+              </View>
             )}
-
           </View>
 
+          {/* Continuar */}
+          <Pressable
+            style={[
+              styles.botao,
+              !sessaoSelecionada && styles.botaoDesabilitado,
+            ]}
+            disabled={!sessaoSelecionada}
+            onPress={() => {
+              if (!sessaoSelecionada) return;
+
+              router.push({
+                pathname: '/ingressos',
+                params: {
+                  id: String(movie.id),
+                  sessao: sessaoSelecionada,
+                },
+              });
+            }}
+            accessibilityRole="button"
+          >
+            <Text style={styles.textoBotao}>
+              Ir para ingressos
+            </Text>
+
+            <Ionicons
+              name="arrow-forward"
+              size={19}
+              color={CORES.fundo}
+            />
+          </Pressable>
+
+          <View style={styles.rodape}>
+            <Ionicons
+              name="sparkles-outline"
+              size={14}
+              color={CORES.roxo}
+            />
+
+            <Text style={styles.textoRodape}>
+              Sua próxima experiência está no Violet+
+            </Text>
+          </View>
         </View>
-
       </ScrollView>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   fundo: {
-    backgroundColor: '#2f1746',
     flex: 1,
-    paddingTop: 10,
+    backgroundColor: CORES.fundo,
   },
 
   container: {
-    backgroundColor: '#7942ac',
-    margin: 20,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#c89de9',
-    elevation: 10,
+    flex: 1,
   },
 
   conteudo: {
-    padding: 20,
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 26,
   },
 
   filme: {
-    alignItems: 'center',
+    maxWidth: 680,
+    alignSelf: 'center',
+    backgroundColor: CORES.painel,
+    borderWidth: 1,
+    borderColor: CORES.borda,
+    borderRadius: 22,
+    padding: 20,
   },
 
- 
+  cabecalho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 13,
+    marginBottom: 23,
+  },
+
   botaoVoltar: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    backgroundColor: '#2b004d',
-    borderWidth: 1,
-    borderColor: '#c89de9',
-    borderRadius: 50,
     width: 40,
     height: 40,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 10,
+    backgroundColor: CORES.superficie,
+    borderWidth: 1,
+    borderColor: CORES.borda,
   },
 
-  titulo: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
+  rotuloCabecalho: {
+    color: CORES.textoSecundario,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+  },
+
+  destaqueFilme: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+    marginBottom: 27,
   },
 
   imagem: {
-    width: 220,
-    height: 300,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#c89de9',
-    marginBottom: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#49305e',
+    backgroundColor: CORES.superficie,
   },
 
-  informacoes: {
-    width: '100%',
+  detalhesPoster: {
+    flex: 1,
+    alignItems: 'flex-start',
+    gap: 11,
+  },
+
+  etiqueta: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#241530',
+    borderWidth: 1,
+    borderColor: '#49305e',
+    borderRadius: 7,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+  },
+
+  textoEtiqueta: {
+    color: CORES.lilas,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+
+  titulo: {
+    color: CORES.texto,
+    fontSize: 23,
+    fontWeight: '900',
+    lineHeight: 29,
+    flexShrink: 1,
+  },
+
+  linhaDecorativa: {
+    width: 43,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: CORES.roxo,
+    marginTop: 1,
+  },
+
+  textoPoster: {
+    color: CORES.textoSecundario,
+    fontSize: 12,
+    lineHeight: 19,
+  },
+
+  secao: {
+    marginBottom: 25,
+  },
+
+  tituloSecaoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+
+  barraTitulo: {
+    width: 4,
+    height: 20,
+    borderRadius: 2,
+    backgroundColor: CORES.roxo,
   },
 
   subtitulo: {
-    color: '#c89de9',
-    fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: 8,
+    color: CORES.texto,
+    fontSize: 17,
+    fontWeight: '800',
   },
 
   descricao: {
-    color: '#f0e5ff',
+    color: CORES.textoSecundario,
     fontSize: 14,
-    lineHeight: 22,
-    textAlign: 'center',
+    lineHeight: 23,
   },
 
   tituloSessaoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginTop: 28,
-    marginBottom: 16,
+    gap: 12,
+    marginBottom: 17,
+  },
+
+  iconeSessao: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: CORES.superficie,
+    borderWidth: 1,
+    borderColor: CORES.borda,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  textosSessao: {
+    flex: 1,
+    gap: 4,
   },
 
   tituloSessao: {
-    color: '#fff',
+    color: CORES.texto,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '800',
+  },
+
+  ajudaSessao: {
+    color: CORES.textoSecundario,
+    fontSize: 12,
   },
 
   sessoes: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
     gap: 10,
-    marginBottom: 20,
   },
 
-  
   sessao: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#2b004d',
+    justifyContent: 'center',
+    gap: 7,
+    backgroundColor: CORES.superficie,
     borderWidth: 1,
-    borderColor: '#c89de9',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    borderColor: CORES.borda,
+    borderRadius: 11,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
   },
 
   sessaoSelecionada: {
-    backgroundColor: '#c89de9',
-    borderColor: '#fff',
+    backgroundColor: CORES.lilas,
+    borderColor: CORES.lilas,
   },
 
   textoSessao: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
+    color: CORES.texto,
+    fontSize: 13,
+    fontWeight: '700',
   },
 
   textoSessaoSelecionada: {
-    color: '#2b004d',
+    color: CORES.fundo,
   },
 
-  
   aviso: {
-    color: '#c89de9',
-    fontSize: 13,
-    fontStyle: 'italic',
-    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 13,
   },
 
-  
+  textoAviso: {
+    color: CORES.textoSecundario,
+    fontSize: 12,
+  },
+
   botao: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#c89de9',
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    marginTop: 20,
-    width: '80%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    gap: 10,
+    backgroundColor: CORES.lilas,
+    borderRadius: 13,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    marginTop: 1,
+  },
+
+  botaoDesabilitado: {
+    opacity: 0.4,
   },
 
   textoBotao: {
-    color: '#2b004d',
+    color: CORES.fundo,
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
 
-  erro: {
-    color: '#e6d2f5',
-    fontSize: 18,
+  rodape: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 19,
+  },
+
+  textoRodape: {
+    color: CORES.textoSecundario,
+    fontSize: 11,
     textAlign: 'center',
-    padding: 50,
   },
 
+  fundoErro: {
+    flex: 1,
+    backgroundColor: CORES.fundo,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+
+  cardErro: {
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+    backgroundColor: CORES.painel,
+    borderWidth: 1,
+    borderColor: CORES.borda,
+    borderRadius: 20,
+    padding: 28,
+    gap: 14,
+  },
+
+  tituloErro: {
+    color: CORES.texto,
+    fontSize: 20,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+
+  textoErro: {
+    color: CORES.textoSecundario,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 21,
+  },
+
+  botaoVoltarErro: {
+    backgroundColor: CORES.lilas,
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    marginTop: 5,
+  },
+
+  textoBotaoErro: {
+    color: CORES.fundo,
+    fontSize: 14,
+    fontWeight: '800',
+  },
 });
